@@ -23,6 +23,8 @@ const (
 	// Default maximum number of bonded validators
 	DefaultMaxValidators uint32 = 100
 
+	DefaultCurrentValidators uint32 = 10
+
 	// Default maximum entries in a UBD/RED pair
 	DefaultMaxEntries uint32 = 7
 
@@ -39,6 +41,7 @@ var (
 	KeyBondDenom         = []byte("BondDenom")
 	KeyHistoricalEntries = []byte("HistoricalEntries")
 	KeyPowerReduction    = []byte("PowerReduction")
+	KeyCurrentValidators = []byte("CurrentValidators")
 )
 
 var _ paramtypes.ParamSet = (*Params)(nil)
@@ -49,13 +52,14 @@ func ParamKeyTable() paramtypes.KeyTable {
 }
 
 // NewParams creates a new Params instance
-func NewParams(unbondingTime time.Duration, maxValidators, maxEntries, historicalEntries uint32, bondDenom string) Params {
+func NewParams(unbondingTime time.Duration, maxValidators, maxEntries, historicalEntries uint32, bondDenom string, currentValidators uint32) Params {
 	return Params{
 		UnbondingTime:     unbondingTime,
 		MaxValidators:     maxValidators,
 		MaxEntries:        maxEntries,
 		HistoricalEntries: historicalEntries,
 		BondDenom:         bondDenom,
+		CurrentValidators: currentValidators,
 	}
 }
 
@@ -64,6 +68,7 @@ func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{
 		paramtypes.NewParamSetPair(KeyUnbondingTime, &p.UnbondingTime, validateUnbondingTime),
 		paramtypes.NewParamSetPair(KeyMaxValidators, &p.MaxValidators, validateMaxValidators),
+		paramtypes.NewParamSetPair(KeyCurrentValidators, &p.CurrentValidators, validateCurrentValidators),
 		paramtypes.NewParamSetPair(KeyMaxEntries, &p.MaxEntries, validateMaxEntries),
 		paramtypes.NewParamSetPair(KeyHistoricalEntries, &p.HistoricalEntries, validateHistoricalEntries),
 		paramtypes.NewParamSetPair(KeyBondDenom, &p.BondDenom, validateBondDenom),
@@ -78,6 +83,7 @@ func DefaultParams() Params {
 		DefaultMaxEntries,
 		DefaultHistoricalEntries,
 		sdk.DefaultBondDenom,
+		DefaultCurrentValidators,
 	)
 }
 
@@ -136,6 +142,19 @@ func validateUnbondingTime(i interface{}) error {
 
 	if v <= 0 {
 		return fmt.Errorf("unbonding time must be positive: %d", v)
+	}
+
+	return nil
+}
+
+func validateCurrentValidators(i interface{}) error {
+	v, ok := i.(uint32)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
+	if v == 0 {
+		return fmt.Errorf("max validators must be positive: %d", v)
 	}
 
 	return nil

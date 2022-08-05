@@ -164,7 +164,7 @@ func UnmarshalValidator(cdc codec.BinaryCodec, value []byte) (v Validator, err e
 
 // IsBonded checks if the validator status equals Bonded
 func (v Validator) IsBonded() bool {
-	return v.GetStatus() == Bonded
+	return v.GetStatus() == Bonded || v.GetStatus() == Cemented
 }
 
 // IsUnbonded checks if the validator status equals Unbonded

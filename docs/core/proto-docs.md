@@ -6795,6 +6795,7 @@ BondStatus is the status of a validator.
 | BOND_STATUS_UNBONDED | 1 | UNBONDED defines a validator that is not bonded. |
 | BOND_STATUS_UNBONDING | 2 | UNBONDING defines a validator that is unbonding. |
 | BOND_STATUS_BONDED | 3 | BONDED defines a validator that is bonded. |
+| BOND_STATUS_CEMENTED | 4 | CEMENTED defines a validator that is currently active in the rotation |
 
 
  <!-- end enums -->
