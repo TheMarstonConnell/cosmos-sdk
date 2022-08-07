@@ -108,6 +108,11 @@ include contrib/devtools/Makefile
 ###                                  Build                                  ###
 ###############################################################################
 
+build-darwin:
+	GOOS=darwin GOARCH=$(if $(findstring aarch64,$(shell uname -m)) || $(findstring arm64,$(shell uname -m)),arm64,amd64) LEDGER_ENABLED=false $(MAKE) build
+install-darwin: build-darwin
+	cp build/simd ~/go/bin/simd
+
 BUILD_TARGETS := build install
 
 build: BUILD_ARGS=-o $(BUILDDIR)/
