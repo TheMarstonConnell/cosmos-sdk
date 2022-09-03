@@ -109,6 +109,7 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 		return ctx, sdkerrors.Wrapf(sdkerrors.ErrUnknownAddress, "fee payer address: %s does not exist", deductFeesFrom)
 	}
 
+	
 	msgs := tx.GetMsgs()
 	freeMessages := dfd.feegrantKeeper.GetFreeMessages(ctx)
 
