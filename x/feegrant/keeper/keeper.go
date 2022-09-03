@@ -36,6 +36,15 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", feegrant.ModuleName))
 }
 
+func (k Keeper) SetFreeMessage(ctx sdk.Context, message string) {
+
+	store := ctx.KVStore(k.storeKey)
+
+	key := append(feegrant.FreeMessageKeyPrefix, []byte(message)...)
+
+	store.Set(key, []byte(message))
+}
+
 // GrantAllowance creates a new grant
 func (k Keeper) GrantAllowance(ctx sdk.Context, granter, grantee sdk.AccAddress, feeAllowance feegrant.FeeAllowanceI) error {
 
@@ -119,6 +128,25 @@ func (k Keeper) getGrant(ctx sdk.Context, granter sdk.AccAddress, grantee sdk.Ac
 	}
 
 	return &feegrant, nil
+}
+
+// getGrant returns entire grant between both accounts
+func (k Keeper) GetFreeMessages(ctx sdk.Context) []string {
+
+	store := ctx.KVStore(k.storeKey)
+	iter := sdk.KVStorePrefixIterator(store, feegrant.FreeMessageKeyPrefix)
+	defer iter.Close()
+
+	var list []string
+
+	stop := false
+	for ; iter.Valid() && !stop; iter.Next() {
+		bz := iter.Value()
+		var msg string = string(bz)
+		list = append(list, msg)
+	}
+
+	return list
 }
 
 // IterateAllFeeAllowances iterates over all the grants in the store.
@@ -211,6 +239,10 @@ func (k Keeper) InitGenesis(ctx sdk.Context, data *feegrant.GenesisState) error 
 			return err
 		}
 	}
+
+	for _, f := range data.FreeMessages {
+		k.SetFreeMessage(ctx, f)
+	}
 	return nil
 }
 
@@ -223,7 +255,10 @@ func (k Keeper) ExportGenesis(ctx sdk.Context) (*feegrant.GenesisState, error) {
 		return false
 	})
 
+	s := k.GetFreeMessages(ctx)
+
 	return &feegrant.GenesisState{
-		Allowances: grants,
+		Allowances:   grants,
+		FreeMessages: s,
 	}, err
 }

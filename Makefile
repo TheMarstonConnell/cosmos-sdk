@@ -107,6 +107,8 @@ include contrib/devtools/Makefile
 ###############################################################################
 ###                                  Build                                  ###
 ###############################################################################
+install-linux: build install
+	cp build/simd ~/go/bin/simd
 
 build-darwin:
 	GOOS=darwin GOARCH=$(if $(findstring aarch64,$(shell uname -m)) || $(findstring arm64,$(shell uname -m)),arm64,amd64) LEDGER_ENABLED=false $(MAKE) build
